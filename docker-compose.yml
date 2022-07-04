@@ -1,0 +1,53 @@
+services:
+  nagios:
+    image: ethnchao/nagios
+    container_name: nagios
+    command: --enable-ndo --create-db --server-url http://127.0.0.1
+    ports:
+      - 80:80
+      - 3000:3000
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      - nagios_mysql
+    volumes:
+      - ./data/plugin:/data/plugin
+      - ./data/conf:/usr/local/nagios/etc/mount
+      - ./data/example:/data/example
+  nagios_mysql:
+    image: mariadb:10.7.4 
+    container_name: mysql
+    ports:
+      - 3306:3306
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    environment:
+      - MYSQL_USER=nagios
+      - MYSQL_PASSWORD=nagios
+      - MYSQL_ADDRESS=nagios_mysql
+      - MYSQL_DATABASE=nagios
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    volumes:
+      - nagios_db_data:/var/lib/mysql
+  bind:
+    build: bind
+    ports:
+    #  - "53:53/udp"
+      - "53:53/tcp"
+      - "53:53/udp"
+    #volumes:
+    #  - ./bind/etc:/etc/bind
+    #  - ./bind/lib:/var/lib/bind
+    #  - logvolume01:/var/log
+    #  - bindcachevolume01:/var/cache/bind
+volumes:
+  nagios_db_data:
+  logvolume01: {}
+  bindvolume01: {}
+  bindcachevolume01: {}

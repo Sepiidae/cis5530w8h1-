@@ -1,0 +1,4 @@
+zone "cis5530" {
+    type master;
+    file "/etc/bind/zones/db.cis5530";
+};
